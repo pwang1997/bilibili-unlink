@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "go-bil-unlink",
+  "outputfilename": "go-bil-unlink",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Zhengliang Wang",
+    "email": "puck19970418@gmail.com"
+  }
+}
