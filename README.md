@@ -1,5 +1,8 @@
 # README
 
+## Some Reference
+- [Bilibili API Collection](https://github.com/SocialSisterYi/bilibili-API-collect)
+
 ## About
 
 This is the official Wails React-TS template.
