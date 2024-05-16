@@ -5,7 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/CuteReimu/bilibili/v2"
 )
 
 // App struct
@@ -62,11 +66,11 @@ func getFav(mediumId string, pageNumber int, pageSize int) FavResponse {
 	return favResponse
 }
 
-func getUnavailableBVs(mediumId string, pageSize int) []string {
+func getUnavailableIds(mediumId string, pageSize int) []int {
 
 	var pageNumber = 1
 	var hasMore = true
-	var bvIdToDelete []string
+	var idsToDelete []int
 
 	for hasMore {
 		var favResponse FavResponse = getFav(mediumId, pageNumber, pageSize)
@@ -81,19 +85,46 @@ func getUnavailableBVs(mediumId string, pageSize int) []string {
 			var Title = mediaList[i].Title
 
 			if Title == "已失效视频" {
-				bvIdToDelete = append(bvIdToDelete, mediaList[i].Bvid)
+				idsToDelete = append(idsToDelete, mediaList[i].Id)
 			}
 		}
 		pageNumber++
+		time.Sleep(2 * time.Second)
 	}
 
-	return bvIdToDelete
+	return idsToDelete
+}
+
+var client = bilibili.New()
+var isSignIn = false
+
+func signIn() {
+	qrCode, _ := client.GetQRCode()
+	qrCode.Print()
+
+	result, err := client.LoginWithQRCode(bilibili.LoginWithQRCodeParam{
+		QrcodeKey: qrCode.QrcodeKey,
+	})
+	if err == nil && result.Code == 0 {
+		log.Println("登录成功")
+		isSignIn = true
+	}
 }
 
 func (a *App) DissociateOrphanFav(mediumId string) {
+	if !isSignIn {
+		signIn()
+	}
+
 	pageSize := 20
 
-	var bvIdToDelete []string = getUnavailableBVs(mediumId, pageSize)
+	client.CleanFavourResources(bilibili.MediaIdParam{
+		MediaId: 2497039877,
+	})
 
-	fmt.Println("Bvs to delete: ", bvIdToDelete)
+	println("Done...")
+
+	var idsToDelete []int = getUnavailableIds(mediumId, pageSize)
+
+	fmt.Println("Bvs to delete: ", idsToDelete)
 }
